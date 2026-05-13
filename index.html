@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Signal — Weekly AI Insights</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #0e0e0e;
+      --paper: #f5f0e8;
+      --accent: #c8401a;
+      --muted: #8a8070;
+      --line: #d4cec3;
+    }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.6;
+    }
+
+    .wrapper {
+      max-width: 620px;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Top label */
+    .label {
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.1s forwards;
+    }
+    .label::before {
+      content: '';
+      display: inline-block;
+      width: 28px;
+      height: 1.5px;
+      background: var(--accent);
+    }
+
+    /* Headline */
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 7vw, 4.8rem);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.4rem;
+      opacity: 0;
+      animation: fadeUp 0.7s ease 0.2s forwards;
+    }
+    h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: var(--line);
+      margin: 1.8rem 0;
+      opacity: 0;
+      animation: fadeUp 0.5s ease 0.35s forwards;
+    }
+
+    /* Sub text */
+    .sub {
+      font-size: 1.05rem;
+      font-weight: 300;
+      color: var(--muted);
+      line-height: 1.65;
+      margin-bottom: 2.4rem;
+      opacity: 0;
+      animation: fadeUp 0.7s ease 0.4s forwards;
+    }
+    .sub strong {
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    /* Bullets */
+    .perks {
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+      margin-bottom: 2.8rem;
+      opacity: 0;
+      animation: fadeUp 0.7s ease 0.5s forwards;
+    }
+    .perk {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      font-size: 0.92rem;
+      color: var(--ink);
+    }
+    .perk-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+      margin-top: 0.45em;
+    }
+
+    /* Form */
+    .form-row {
+      display: flex;
+      gap: 0.6rem;
+      opacity: 0;
+      animation: fadeUp 0.7s ease 0.6s forwards;
+    }
+
+    input[type="email"] {
+      flex: 1;
+      padding: 0.9rem 1.1rem;
+      border: 1.5px solid var(--line);
+      background: transparent;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      color: var(--ink);
+      outline: none;
+      transition: border-color 0.2s;
+      border-radius: 2px;
+    }
+    input[type="email"]::placeholder { color: var(--muted); }
+    input[type="email"]:focus { border-color: var(--ink); }
+
+    button {
+      padding: 0.9rem 1.6rem;
+      background: var(--ink);
+      color: var(--paper);
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: background 0.2s, transform 0.15s;
+      white-space: nowrap;
+    }
+    button:hover { background: var(--accent); transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
+
+    /* Success state */
+    .success-msg {
+      display: none;
+      font-size: 0.92rem;
+      color: var(--accent);
+      font-weight: 500;
+      margin-top: 1rem;
+      letter-spacing: 0.02em;
+    }
+
+    .fine-print {
+      margin-top: 1rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+      opacity: 0;
+      animation: fadeUp 0.7s ease 0.75s forwards;
+    }
+
+    /* Decorative issue number */
+    .issue-tag {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      font-family: 'Playfair Display', serif;
+      font-size: 0.75rem;
+      color: var(--line);
+      letter-spacing: 0.1em;
+      writing-mode: vertical-rl;
+      display: none;
+    }
+    @media (min-width: 768px) { .issue-tag { display: block; } }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 500px) {
+      .form-row { flex-direction: column; }
+      button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wrapper">
+    <div class="label">Weekly Newsletter</div>
+
+    <h1>Ideas worth<br/><em>paying attention</em><br/>to.</h1>
+
+    <div class="divider"></div>
+
+    <p class="sub">
+      <strong>The Signal</strong> delivers one sharp idea every week — trends, tools, and strategies at the intersection of AI and independent income. No noise. No fluff.
+    </p>
+
+    <div class="perks">
+      <div class="perk"><div class="perk-dot"></div><span>One actionable insight, every Tuesday morning</span></div>
+      <div class="perk"><div class="perk-dot"></div><span>Real examples from creators earning with AI tools</span></div>
+      <div class="perk"><div class="perk-dot"></div><span>Free — always. Unsubscribe in one click.</span></div>
+    </div>
+
+    <div class="form-row">
+      <input type="email" id="emailInput" placeholder="your@email.com" />
+      <button onclick="handleSubmit()">Subscribe →</button>
+    </div>
+
+    <div class="success-msg" id="successMsg">
+      ✦ You're in. Check your inbox for a welcome note.
+    </div>
+
+    <p class="fine-print">Joining 0 readers. No spam, ever.</p>
+  </div>
+
+  <div class="issue-tag">Est. 2025 — Vol. I</div>
+
+  <script>
+    function handleSubmit() {
+      const email = document.getElementById('emailInput').value.trim();
+      if (!email || !email.includes('@')) {
+        document.getElementById('emailInput').style.borderColor = '#c8401a';
+        setTimeout(() => {
+          document.getElementById('emailInput').style.borderColor = '';
+        }, 1200);
+        return;
+      }
+      document.querySelector('.form-row').style.opacity = '0.4';
+      document.querySelector('.form-row').style.pointerEvents = 'none';
+      document.getElementById('successMsg').style.display = 'block';
+    }
+  </script>
+
+</body>
+</html>
